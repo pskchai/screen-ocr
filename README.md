@@ -66,7 +66,7 @@ Add this to `~/.hammerspoon/init.lua`:
 
 ```lua
 hs.hotkey.bind({"cmd", "shift"}, "2", function()
-  hs.task.new("/Users/megacodexz/Utilities/ocr/ocr.sh", nil):start()
+  hs.task.new("/path/to/ocr.sh", nil):start()
 end)
 ```
 
@@ -77,7 +77,7 @@ Press **⌘⇧2** from any app → drag a region → paste the OCR'd text.
 
 ## Fallbacks
 
-- **skhd** — add `cmd + shift - 2 : /Users/megacodexz/Utilities/ocr/ocr.sh` to
+- **skhd** — add `cmd + shift - 2 : /path/to/ocr.sh` to
   `~/.skhdrc` and grant skhd Screen Recording.
 - **Shortcuts.app / Automator Quick Action** — a "Run Shell Script" exposed as a
   Quick Action with a keyboard shortcut works, but Quick Actions run in the
