@@ -1,15 +1,20 @@
-# Screen OCR — hotkey region capture to clipboard (macOS)
+# Screen OCR — hotkey region capture to text window (macOS)
 
 Press a global hotkey, drag-select a screen region, and the text is OCR'd by a
-local MLX vision model (`mlx-community/GLM-OCR-bf16`) and placed on your
-clipboard. Inference runs on-device via `mlx_vlm.generate`; Tinycast starts
+local MLX vision model (`mlx-community/GLM-OCR-bf16`) and shown in a scrollable
+text window. Select **Copy** to copy the text and close the window. Select
+**Dismiss** or press **Esc** to close it and keep the clipboard as it is.
+The window uses native macOS glass and Tinycast-style pill buttons. It starts
+small, grows to fit the text, and scrolls when the text reaches the size limit.
+The result window requires macOS 26 or later.
+Inference runs on-device via `mlx_vlm.generate`; Tinycast starts
 the script from its launcher or a global hotkey.
 
 ## How it works
 
 ```
 hotkey -> screencapture -i (region) -> mlx_vlm.generate --image --no-verbose
-       -> pbcopy -> silent notification
+       -> text window -> Copy (pbcopy) or Dismiss
 ```
 
 Errors (e.g. model not found, download failure) are copied to the clipboard and
@@ -45,7 +50,7 @@ shown in a notification. An empty result never overwrites your clipboard.
 Quick check (no hotkey yet), against an existing image:
 
 ```sh
-./ocr.sh /path/to/some-screenshot.png   # text lands on the clipboard
+./ocr.sh /path/to/some-screenshot.png   # opens the text window
 ```
 
 ## Tinycast Script Command

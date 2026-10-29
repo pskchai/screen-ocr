@@ -1,5 +1,5 @@
 #!/bin/bash
-# ocr.sh — region screenshot -> local MLX VLM OCR -> clipboard (macOS)
+# ocr.sh — region screenshot -> local MLX VLM OCR -> result window (macOS)
 # Usage: ocr.sh [image.png]   (no arg = interactive region selection)
 
 set -uo pipefail
@@ -28,7 +28,8 @@ else
   img="$TMPDIR/ocr_$$.png"; shot="$img"
 fi
 errlog="$TMPDIR/ocr_$$.err"
-trap 'rm -f "$errlog" ${shot:+"$shot"}' EXIT
+result=""
+trap 'rm -f "$errlog" ${shot:+"$shot"} ${result:+"$result"}' EXIT
 
 if [ -n "$shot" ]; then
   screencapture -i "$img"
@@ -53,5 +54,11 @@ text=$(printf '%s' "$text" | perl -0pe '
 # 4. empty guard -> don't clobber clipboard
 [ -n "$text" ] || { notify "No text found"; exit 0; }
 
-printf '%s' "$text" | pbcopy
-notify "Recognized ${#text} characters"
+# 5. show the text; copy only when the user selects Copy.
+result=$(mktemp "${TMPDIR%/}/ocr_XXXXXX.txt") || fail "Cannot create result file"
+printf '%s' "$text" > "$result"
+choice=$(osascript -l JavaScript "$HERE/show-result.js" "$result") \
+  || fail "Cannot show OCR result"
+if [ "$choice" = "Copy" ]; then
+  printf '%s' "$text" | pbcopy
+fi
