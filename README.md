@@ -2,8 +2,8 @@
 
 Press a global hotkey, drag-select a screen region, and the text is OCR'd by a
 local MLX vision model (`mlx-community/GLM-OCR-bf16`) and placed on your
-clipboard. Inference runs on-device via `mlx_vlm.generate`; Hammerspoon drives
-the hotkey.
+clipboard. Inference runs on-device via `mlx_vlm.generate`; Tinycast starts
+the script from its launcher or a global hotkey.
 
 ## How it works
 
@@ -40,7 +40,7 @@ shown in a notification. An empty result never overwrites your clipboard.
    chmod +x ocr.sh
    ```
 
-4. Install [Hammerspoon](https://www.hammerspoon.org) (`brew install --cask hammerspoon`) and launch it.
+4. Install and launch [Tinycast](https://tinycast.dev/).
 
 Quick check (no hotkey yet), against an existing image:
 
@@ -48,32 +48,22 @@ Quick check (no hotkey yet), against an existing image:
 ./ocr.sh /path/to/some-screenshot.png   # text lands on the clipboard
 ```
 
-## Step 0 — Grant Hammerspoon permissions (do this first)
+## Tinycast Script Command
 
-Hammerspoon runs the script as its own child process, so it is the stable owner
-of the capture and you grant permission **once** — unlike Shortcuts/Quick
-Actions, which run in the frontmost app's context and re-prompt per app.
+The Raycast-compatible command is `raycast/screen-ocr.sh`. It starts the same
+local OCR script.
 
-In **System Settings → Privacy & Security**, enable **Hammerspoon** under:
-- **Accessibility** — required for the global hotkey.
-- **Screen Recording** — required, or `screencapture` returns a blank/wallpaper
-  image. You may need to trigger one capture so Hammerspoon appears in the list,
-  then toggle it on and relaunch Hammerspoon.
+1. In Tinycast, open **Settings → Commands** and enable **Custom Commands**.
+2. Select **Import Raycast Scripts** and choose the `raycast/` folder in this
+   project. Confirm the import.
+3. Search for **Screen OCR** in the launcher and run it. Confirm the command
+   if Tinycast asks, then select a screen region.
 
-## Step 1 — Global hotkey (Hammerspoon)
+Tinycast must have Screen Recording permission for screen capture. You can
+assign a hotkey, such as **⌘⇧2**, in **Settings → Commands**.
 
-Add this to `~/.hammerspoon/init.lua`:
-
-```lua
-hs.hotkey.bind({"cmd", "shift"}, "2", function()
-  hs.task.new("/path/to/ocr.sh", nil):start()
-end)
-```
-
-Use the absolute path (`hs.task` does not inherit a shell), then reload the
-config from the Hammerspoon menu-bar icon → **Reload Config**.
-
-Press **⌘⇧2** from any app → drag a region → paste the OCR'd text.
+Tinycast imports the command once. Keep this project at the same path, because
+the imported command calls the script at that path.
 
 ## Fallbacks
 
@@ -87,10 +77,10 @@ Press **⌘⇧2** from any app → drag a region → paste the OCR'd text.
 
 ## Troubleshooting
 
-- **Blank/wallpaper capture** → Hammerspoon lacks Screen Recording permission
-  (Step 0); relaunch Hammerspoon after toggling it on.
-- **Hotkey does nothing** → Hammerspoon lacks Accessibility permission, or the
-  config wasn't reloaded.
+- **Blank/wallpaper capture** → check Tinycast's Screen Recording permission
+  in **System Settings → Privacy & Security**.
+- **Hotkey does nothing** → check that Tinycast is running and that **Screen
+  OCR** is enabled and has a hotkey in **Settings → Commands**.
 - **Clipboard shows `Failed: mlx_vlm.generate not found …`** → run `uv sync` in
   this directory.
 - **Clipboard shows `Failed: …RepositoryNotFoundError…`** → bad `MODEL=` /
